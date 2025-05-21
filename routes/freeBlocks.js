@@ -26,7 +26,15 @@ router.get('/', async (req, res) => {
         timeMin: now.toISOString(),
         timeMax: endOfDay.toISOString(),
         timeZone: 'America/New_York',
-        items: [{ id: 'primary' }],
+        items: [
+          { id: 'primary' },
+          { id: '809ac72bd06f3c01e6ff651c96fb6407789940b2866e2d4fe0030322475c1ca6@group.calendar.google.com' },
+          { id: 'bfe9a44806caa9eea74194bdc333ec2037c052a4c3756878105bff1ba33e7600@group.calendar.google.com' },
+          { id: 'a2fc97945b860bed3b137558e401e0e8215e59fdf4437d0432ca189c73ce8699@group.calendar.google.com' },
+          { id: 'e772e70ec349587e78ecc01f211c2bf9979c1a28715e0e37f41048eed9113af7@group.calendar.google.com' },
+          { id: 'bb8d47ee51a63337fd38e8915b2747e4677affaf953245e65cc2fbc5d00922f1@group.calendar.google.com' },
+          { id: '9aac5e2ff502178fc7dce0d199636261086038a0079e15dfbe1a196e473ea2fa@group.calendar.google.com' }
+        ],
       }
     });
 
