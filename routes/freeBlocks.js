@@ -17,8 +17,15 @@ const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
 router.get('/', async (req, res) => {
   const now = new Date();
+  now.setSeconds(0);
+  now.setMilliseconds(0);
+  
   const endOfDay = new Date(now);
   endOfDay.setHours(18, 0, 0, 0); // 6 PM
+
+  if (now >= endOfDay) {
+  return res.status(200).json({ freeWindows: [] });
+}
 
   try {
     const response = await calendar.freebusy.query({
