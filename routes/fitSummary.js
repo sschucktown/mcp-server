@@ -1,39 +1,37 @@
-const express = require('express');
-const { google } = require('googleapis');
-const router = express.Router();
-
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
-);
-
-oauth2Client.setCredentials({
-  refresh_token: process.env.GOOGLE_REFRESH_TOKEN
-});
-
-const fitness = google.fitness({ version: 'v1', auth: oauth2Client });
-
 router.get('/', async (req, res) => {
   try {
-    const now = Date.now();
-    const oneDayMs = 24 * 60 * 60 * 1000;
-    const startTime = now - oneDayMs * 2; // 2 days ago
-    const endTime = now;
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI
+    );
 
-    const response = await fitness.users.sessions.list({
-      userId: 'me',
-      startTime: new Date(startTime).toISOString(),
-      endTime: new Date(endTime).toISOString(),
+    oauth2Client.setCredentials({
+      refresh_token: process.env.GOOGLE_REFRESH_TOKEN
     });
 
-    const sleepSessions = response.data.session?.filter(s => s.activityType === 72); // Sleep
+    const fitness = google.fitness({ version: 'v1', auth: oauth2Client });
 
-    res.json({ sleepSessions });
-  } catch (error) {
-    console.error("❌ Error fetching sleep data:", error.message);
+    const now = Date.now();
+    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+
+    console.log("📡 Fetching sleep data...");
+    const response = await fitness.users.dataset.aggregate({
+      userId: 'me',
+      requestBody: {
+        aggregateBy: [{
+          dataTypeName: 'com.google.sleep.segment'
+        }],
+        bucketByTime: { durationMillis: 86400000 },
+        startTimeMillis: oneDayAgo,
+        endTimeMillis: now
+      }
+    });
+
+    console.log("✅ Sleep data:", JSON.stringify(response.data, null, 2));
+    res.json(response.data);
+  } catch (err) {
+    console.error("❌ Error fetching sleep data:", err.message, err.response?.data || err);
     res.status(500).json({ error: "Failed to fetch sleep data" });
   }
 });
-
-module.exports = router;
