@@ -1,3 +1,6 @@
+const express = require('express');
+const router = express.Router();
+
 router.get('/', async (req, res) => {
   try {
     const oauth2Client = new google.auth.OAuth2(
